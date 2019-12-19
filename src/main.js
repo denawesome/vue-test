@@ -1,4 +1,10 @@
 import Vue from 'vue'
+import 'bootstrap'
+import '@fortawesome/fontawesome-free/css/all.css'
+import '@fortawesome/fontawesome-free/js/all.js'
+
+import 'bootstrap/dist/css/bootstrap.css'
+
 import App from './App.vue'
 
 Vue.config.productionTip = false
