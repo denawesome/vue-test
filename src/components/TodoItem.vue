@@ -1,31 +1,27 @@
 <template>
-    <form>
-        <li class="list-group-item d-flex rounded-0 border-top-0 border-right-0 border-left-0">
-            <input 
-                type="text"
-                :readonly="!isEditing"
-                :class="{'form-control-plaintext': !isEditing, 'form-control': isEditing}"
-                v-model="todoItem.title"
-            >
-            <div class="btn-group btn-group-sm" role="group" :class="{hide: isEditing}">
-                <button @click="isEditing = true" type="button" class="btn btn-primary">
-                    <i class="far fa-edit"></i>
-                </button>
-                <button @click="$emit('remove-todo-item', todoItem.id)" type="button" class="btn btn-danger">
-                    <i class="far fa-trash-alt"></i>
-                </button>
-            </div>
-            <div v-if="isEditing" class="btn-group btn-group-sm" role="group">
-                <button @click="isEditing = false" type="button" class="btn btn-primary">
-                    <i class="far fa-save"></i>
-                </button>
-            </div>
-        </li>
-    </form>
+    <li class="list-group-item d-flex rounded-0 border-top-0 border-right-0 border-left-0">
+        <input 
+            type="text"
+            :readonly="!isEditing"
+            :class="{'form-control-plaintext': !isEditing, 'form-control': isEditing}"
+            v-on:handleEditing="isEditing = true"
+            v-model="todoItem.title"
+        >
+        <div class="btn-group btn-group-sm ml-auto" role="group">
+            <Edit :data="todoItem" v-on:edit-todo-item="isEditing = !isEditing" />
+            <Delete :data="todoItem" v-on:delete-todo-item="$emit('delete-todo-item')" />
+        </div>
+    </li>
 </template>
 
 <script>
+import Edit from '@/components/actions/Edit'
+import Delete from '@/components/actions/Delete'
+
 export default {
+    components: {
+        Edit, Delete
+    },
     data() {
         return {
             isEditing: false

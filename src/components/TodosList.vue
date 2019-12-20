@@ -1,65 +1,58 @@
 <template>
 	<div class="col">
-		<TodosListActions 
-			v-on:add-todo-list="addTodoList"
-			v-on:remove-all-todos="removeAllTodos"
-		/>
-		<hr>
-		<div class="accordion w-100" id="todosList" v-if="todos.length">
-			<div class="card" v-for="(list, index) in todos" :key="list.id">
-				<div class="card-header" :id="`heading-${index}`">
-					<button 
-						class="btn btn-link" 
-						type="button"
-						data-toggle="collapse" 
-						:aria-expanded="index === 0 ? true : false" 
-						:data-target="`#collapse-${index}`" 
-						:aria-controls="`collapse-${index}`">{{ list.title }}</button>
-					<div class="ml-auto actions-wrapper">
-						<SingleListActions 
-							v-on:remove-todo-list="removeTodoList"
-							:todoList="list" />
-					</div>
-				</div>
-				<div class="collapse" data-parent="#todosList"
-					:id="`collapse-${index}`"
-					:class="{show: index === 0 ? true : false}"
-					:aria-labelledby="`heading-${index}`">
-					<div class="card-body">
-						<TodoList 
-							:todoList="list" 
-							v-on:remove-todo-from-list="removeTodoFromList"
-						/>
+		<div class="row justify-content-space-between">
+			<div class="col-4">
+				<TodosListActions 
+					v-on:add-todo-list="addTodoList"
+					v-on:remove-all-todos="removeAllTodos"
+				/>
+			</div>
+			<div class="col-8">
+				<div class="form-group row">
+					<label for="filterList" class="col-1 col-form-label">Filter: </label>
+					<div class="col-11">
+						<input type="text" class="form-control" id="filterList" v-model="filteredTodos">
 					</div>
 				</div>
 			</div>
 		</div>
-		<div v-else class="alert alert-secondary" role="alert">
-			No Todos 
+		<hr>
+		<div class="accordion w-100" id="todosList" v-if="todos.length">
+			<TodoList v-for="(todoList, index) in filteredList"
+				:key="todoList.id"
+				:todoList="todoList"
+				:index="index"
+				v-on:delete-todo-from-list="deleteTodoFromList"
+				v-on:delete-todo-list="deleteTodoList"
+			/>
+		</div>
+		<div v-else>
+			<div class="alert alert-info" role="alert">
+				No Lists
+			</div>
 		</div>
 	</div>
 </template>
 
 <script>
 import TodoList from '@/components/TodoList'
-import SingleListActions from '@/components/actions/SingleListActions'
 import TodosListActions from '@/components/actions/TodosListActions'
 
 export default {
 	components: {
-		TodoList, SingleListActions, TodosListActions
+		TodoList, TodosListActions
 	},
 	data() {
 		return {
+			filteredTodos: '',
+			editingListId: -1,
 			todos: [{ 
 				id: 1,
 				title: 'January',
 				data: [
 					{ id: 1, title: 'Make something in January 1', completed: false },
-					{ id: 2, title: 'Make something in January 2', completed: false },
+					{ id: 2, title: 'Make something in January 3', completed: false },
 					{ id: 3, title: 'Make something in January 3', completed: false },
-					{ id: 4, title: 'Make something in January 4', completed: false },
-					{ id: 5, title: 'Make something in January 5', completed: false },
 				]
 			}, { 
 				id: 2,
@@ -68,8 +61,6 @@ export default {
 					{ id: 1, title: 'Make something in February 1', completed: false },
 					{ id: 2, title: 'Make something in February 2', completed: false },
 					{ id: 3, title: 'Make something in February 3', completed: false },
-					{ id: 4, title: 'Make something in February 4', completed: false },
-					{ id: 5, title: 'Make something in February 5', completed: false },
 				]
 			}, { 
 				id: 3,
@@ -78,34 +69,49 @@ export default {
 					{ id: 1, title: 'Make something in March 1', completed: false },
 					{ id: 2, title: 'Make something in March 2', completed: false },
 					{ id: 3, title: 'Make something in March 3', completed: false },
-					{ id: 4, title: 'Make something in March 4', completed: false },
-					{ id: 5, title: 'Make something in March 5', completed: false },
 				]
 			}]
 		}
 	},
 	methods: {
-		removeTodoFromList(options) {
+		deleteTodoFromList(options) {
+			console.log(options);
 			this.todos = this.todos.filter((list) => {
 				if ( list.id === options.todoListId ) {
-					list.data = list.data.filter(todoItem => todoItem.id !== options.todoItemId);
+					list.data = list.data.filter(todoItem => todoItem.id !== options.todoItemId)
 				}
 
-				return list;
-			});
+				return list
+			})
 		},
-		removeTodoList(id) {
-			this.todos = this.todos.filter(list => list.id !== id);
+		deleteTodoList(id) {
+			this.todos = this.todos.filter(list => list.id !== id)
+		},
+		editTodoList(id) {
+			this.editingListId = this.editingListId === id ? -1 : id;
 		},
 		addTodoList(newTodoList) {
-			this.todos.push(newTodoList);
+			this.todos.push(newTodoList)
 		},
 		removeAllTodos() {
-			this.todos = [];
+			this.todos = []
+		}
+	},
+	computed: {
+		filteredList: function() {
+			var _filteredList = this.filteredTodos.toLowerCase();
+
+			return this.todos.filter(function(elem) {
+				if (_filteredList === '') {
+					return true
+				} else {
+					let lowerCasedTitle = elem.title.toLowerCase();
+					return lowerCasedTitle.indexOf(_filteredList) > -1;
+				}
+			})
 		}
 	}
 }
-
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -118,5 +124,11 @@ export default {
 }
 .card-body {
   padding: 0;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter {
+  opacity: 0;
 }
 </style>
