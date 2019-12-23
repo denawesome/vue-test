@@ -9,7 +9,7 @@
         >
         <div class="btn-group btn-group-sm ml-auto" role="group">
             <Edit :data="todoItem" v-on:edit-todo-item="isEditing = !isEditing" />
-            <Delete :data="todoItem" v-on:delete-todo-item="$emit('delete-todo-item')" />
+            <Delete :data="todoItem" v-on:delete-todo-item="$emit('delete-todo-item', todoItem.id)" />
         </div>
     </li>
 </template>

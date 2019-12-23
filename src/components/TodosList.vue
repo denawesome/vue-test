@@ -24,6 +24,7 @@
 				:index="index"
 				v-on:delete-todo-from-list="deleteTodoFromList"
 				v-on:delete-todo-list="deleteTodoList"
+				v-on:add-todo-item="addTodoItem"
 			/>
 		</div>
 		<div v-else>
@@ -75,10 +76,11 @@ export default {
 	},
 	methods: {
 		deleteTodoFromList(options) {
-			console.log(options);
 			this.todos = this.todos.filter((list) => {
 				if ( list.id === options.todoListId ) {
-					list.data = list.data.filter(todoItem => todoItem.id !== options.todoItemId)
+					list.data = list.data.filter(todoItem => {
+						return todoItem.id !== options.todoItemId
+					})
 				}
 
 				return list
@@ -95,6 +97,21 @@ export default {
 		},
 		removeAllTodos() {
 			this.todos = []
+		},
+		addTodoItem(id) {
+			const newTodoItem = {
+                id: Date.now(),
+                title: 'New Todo',
+                completed: false
+			}
+			
+			this.todos = this.todos.filter(list => {
+				if (list.id === id) {
+					list.data.push(newTodoItem);
+				}
+
+				return list;
+			});
 		}
 	},
 	computed: {

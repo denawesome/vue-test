@@ -28,6 +28,7 @@
 						No Todos
 					</div>
 				</div>
+				<Add v-on:add-todo-item="$emit('add-todo-item', todoList.id)" />
 			</div>
 		</div>
 	</div>
@@ -37,6 +38,7 @@
 import TodoItem from '@/components/TodoItem'
 import Edit from '@/components/actions/Edit'
 import Delete from '@/components/actions/Delete'
+import Add from '@/components/actions/Add'
 
 export default {
 	data() {
@@ -52,7 +54,7 @@ export default {
 		index: Number
 	},
 	components: {
-		TodoItem, Edit, Delete
+		TodoItem, Edit, Delete, Add
 	},
 	methods: {
 		deleteTodo(id) {
